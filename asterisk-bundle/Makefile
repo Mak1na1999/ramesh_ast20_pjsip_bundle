@@ -19,7 +19,7 @@ define Package/asterisk20-gateway-bundle
   SECTION:=net
   CATEGORY:=Network
   TITLE:=Asterisk 20 GSM Gateway for OpenWrt 24.10
-  DEPENDS:=+libedit +libopenssl +libncurses +libpthread +libuuid +libxml2 +sqlite3-cli +libsqlite3 +libtirpc +libcap +kmod-usb-serial-option +kmod-usb-serial-wwan +usbutils
+  DEPENDS:=+libedit +libopenssl +libncurses +libpthread +libuuid +libxml2 +sqlite3-cli +libsqlite3 +libtirpc +libcap +kmod-usb-serial-option +kmod-usb-serial-wwan +usbutils +libiconv +alsa-lib
 endef
 
 # Using bundled PJSIP and Jansson to avoid version conflicts in 24.10
