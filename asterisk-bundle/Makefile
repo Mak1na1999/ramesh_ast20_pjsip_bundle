@@ -44,14 +44,16 @@ define Build/Prepare
 endef
 
 define Build/Compile
-	# 1. Compile Asterisk Core
+	# 1. Build Asterisk Core first (Required for headers)
 	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_FLAGS) ASTCFLAGS="-D_GNU_SOURCE"
 	
-	# 2. Compile chan-quectel with explicit pathing
+	# 2. Create a symlink so the driver finds the headers where it expects them
+	ln -sf $(PKG_BUILD_DIR)/include $(PKG_BUILD_DIR)/chan-quectel-src/include
+	
+	# 3. Build chan-quectel
 	$(MAKE) -C $(PKG_BUILD_DIR)/chan-quectel-src \
 		$(MAKE_FLAGS) \
 		ASTERISK_INCLUDE_DIR=$(PKG_BUILD_DIR)/include \
-		ASTERISK_VERSION=200000 \
 		all
 endef
 
