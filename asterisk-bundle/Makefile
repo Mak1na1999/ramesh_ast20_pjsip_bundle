@@ -56,6 +56,8 @@ define Build/Compile
 endef
 
 define Package/asterisk20-gateway-bundle/install
+    $(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/asterisk.init $(1)/etc/init.d/asterisk
 	$(INSTALL_DIR) $(1)/usr/sbin $(1)/usr/lib/asterisk/modules $(1)/etc/asterisk
 	
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/main/asterisk $(1)/usr/sbin/
@@ -64,6 +66,9 @@ define Package/asterisk20-gateway-bundle/install
 	$(CP) $(PKG_BUILD_DIR)/channels/chan_pjsip.so $(1)/usr/lib/asterisk/modules/
 	$(CP) $(PKG_BUILD_DIR)/res/res_pjsip*.so $(1)/usr/lib/asterisk/modules/
 	$(CP) $(PKG_BUILD_DIR)/res/res_pjproject.so $(1)/usr/lib/asterisk/modules/
+    $(CP) $(PKG_BUILD_DIR)/codecs/codec_gsm.so $(1)/usr/lib/asterisk/modules/
+	$(CP) $(PKG_BUILD_DIR)/codecs/codec_alaw.so $(1)/usr/lib/asterisk/modules/
+	$(CP) $(PKG_BUILD_DIR)/codecs/codec_ulaw.so $(1)/usr/lib/asterisk/modules/
 	
 	# Install Source-Compiled Quectel Module
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/chan-quectel-src/chan_quectel.so $(1)/usr/lib/asterisk/modules/
