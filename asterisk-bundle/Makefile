@@ -47,10 +47,11 @@ define Build/Compile
 	# 1. Compile Asterisk Core
 	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_FLAGS) ASTCFLAGS="-D_GNU_SOURCE"
 	
-	# 2. Compile chan-quectel specifically for Asterisk 20
+	# 2. Compile chan-quectel with explicit pathing
 	$(MAKE) -C $(PKG_BUILD_DIR)/chan-quectel-src \
 		$(MAKE_FLAGS) \
 		ASTERISK_INCLUDE_DIR=$(PKG_BUILD_DIR)/include \
+		ASTERISK_VERSION=200000 \
 		all
 endef
 
