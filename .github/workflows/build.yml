@@ -16,7 +16,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential libncurses5-dev gawk git gettext libssl-dev xsltproc wget unzip python3 python3-dev pkg-config curl binutils libedit-dev libsqlite3-dev uuid-dev libjansson-dev libxml2-dev
-
+          # Ensure python3 is the default 'python'
+          sudo ln -sf /usr/bin/python3 /usr/bin/python
+          
       - name: Download SDK
         run: |
           # SDK for GL.iNet Flint 2 (aarch64_cortex-a53)
