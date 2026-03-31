@@ -7,6 +7,7 @@ PKG_RELEASE:=1
 PKG_SOURCE:=asterisk-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://downloads.asterisk.org/pub/telephony/asterisk/releases/
 PKG_HASH:=skip
+PKG_BUILD_DIR:=$(BUILD_DIR)/asterisk-$(PKG_VERSION)
 
 PKG_FIXUP:=autoreconf
 PKG_BUILD_PARALLEL:=1
@@ -36,8 +37,24 @@ CONFIGURE_ARGS += \
 	--with-asound \
 	--with-tonezone
 
+define Build/Configure
+	( cd $(PKG_BUILD_DIR); \
+		$(TARGET_CONFIGURE_OPTS) \
+		$(TARGET_CONFIGURE_ARGS) \
+		./configure \
+			--target=$(GNU_TARGET_NAME) \
+			--host=$(GNU_TARGET_NAME) \
+			--build=$(GNU_HOST_NAME) \
+			$(CONFIGURE_ARGS) \
+	)
+endef
+
 define Build/Compile
-	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_FLAGS) ASTCFLAGS="-D_GNU_SOURCE"
+# Force make to run inside the specific source directory
+	$(MAKE) -C $(PKG_BUILD_DIR) \
+		$(TARGET_CONFIGURE_OPTS) \
+		ASTCFLAGS="-D_GNU_SOURCE" \
+		all
 endef
 
 define Package/asterisk20-pjsip-bundle/install
