@@ -20,7 +20,8 @@ define Package/asterisk20-pjsip-bundle
   CATEGORY:=Network
   TITLE:=Asterisk 20 with Forced Bundled PJSIP
   DEPENDS:=+libedit +libopenssl +libncurses +libpthread +libuuid +libxml2 \
-           +sqlite3-cli +libsqlite3 +libtirpc +libcap +libiconv +alsa-lib
+         +sqlite3-cli +libsqlite3 +libtirpc +libcap +libiconv +alsa-lib \
+         +kmod-usb-serial-option +kmod-usb-serial-wwan
 endef
 
 # We keep all the Gateway flags (iconv, srv, etc.) so the CORE supports GSM
@@ -36,7 +37,10 @@ CONFIGURE_ARGS += \
 	--with-iconv \
 	--with-srv \
 	--with-asound \
-	--with-tonezone
+	--without-tonezone \
+	--without-dahdi \
+	--without-pri \
+	--without-gate
 
 define Build/Configure
 	( cd $(PKG_BUILD_DIR); \
