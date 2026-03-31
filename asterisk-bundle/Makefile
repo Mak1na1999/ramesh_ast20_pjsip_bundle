@@ -8,8 +8,9 @@ PKG_SOURCE:=asterisk-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://downloads.asterisk.org/pub/telephony/asterisk/releases/
 PKG_HASH:=skip
 PKG_BUILD_DIR:=$(BUILD_DIR)/asterisk-$(PKG_VERSION)
-
+ACLOCAL_AMFLAGS:=-I autoconf
 PKG_FIXUP:=autoreconf
+PKG_REMOVE_FILES:=aclocal.m4
 PKG_BUILD_PARALLEL:=1
 
 include $(INCLUDE_DIR)/package.mk
@@ -39,6 +40,7 @@ CONFIGURE_ARGS += \
 
 define Build/Configure
 	( cd $(PKG_BUILD_DIR); \
+		./bootstrap.sh; \
 		$(TARGET_CONFIGURE_OPTS) \
 		$(TARGET_CONFIGURE_ARGS) \
 		./configure \
