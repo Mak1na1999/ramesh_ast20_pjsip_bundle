@@ -1,4 +1,4 @@
-name: Build Asterisk 20 for Flint 2
+name: Build Asterisk 20 Gateway
 
 on:
   push:
@@ -12,35 +12,34 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install Build Dependencies
+      - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libncurses5-dev gawk git gettext libssl-dev xsltproc wget unzip python3
+          sudo apt-get install -y build-essential libncurses5-dev gawk git gettext libssl-dev xsltproc wget unzip python3 curl binutils
 
-      - name: Download OpenWrt SDK (Filogic aarch64)
+      - name: Download SDK
         run: |
-          # Targeting OpenWrt 24.10 for MediaTek Filogic
           wget https://downloads.openwrt.org/releases/24.10.6/targets/mediatek/filogic/openwrt-sdk-24.10.6-mediatek-filogic_gcc-13.3.0_musl.Linux-x86_64.tar.zst
           tar xf *.tar.xz --strip-components=1
 
-      - name: Update and Install Feeds
+      - name: Setup Feeds
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
-      - name: Inject Asterisk Package
+      - name: Prepare Asterisk Package
         run: |
           mkdir -p package/asterisk-bundle
           cp -r ${GITHUB_WORKSPACE}/asterisk-bundle/* package/asterisk-bundle/
 
-      - name: Build Package
+      - name: Compile
         run: |
           make defconfig
-          # Building only the asterisk package to save time
           make package/asterisk-bundle/compile V=s -j$(nproc)
 
-      - name: Upload IPK
+      - name: Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Asterisk20-Flint2-IPK
-          path: bin/packages/aarch64_cortex-a53/base/asterisk20-bundled*.ipk
+          name: Flint2-Asterisk20-SIM7600
+          path: bin/packages/aarch64_cortex-a53/base/asterisk20-gateway-bundle*.ipk
+          
