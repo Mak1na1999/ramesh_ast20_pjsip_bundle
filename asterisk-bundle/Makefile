@@ -40,7 +40,11 @@ CONFIGURE_ARGS += \
 
 define Build/Prepare
 	$(call Build/Prepare/Default)
+	# Clone driver
 	git clone $(CHAN_QUECTEL_URL) $(PKG_BUILD_DIR)/chan-quectel-src
+	# Pre-set Asterisk options to ensure PJSIP and GSM are enabled
+	( cd $(PKG_BUILD_DIR); ./configure $(CONFIGURE_ARGS); make menuselect.makeopts; \
+	  ./menuselect/menuselect --enable chan_pjsip --enable res_pjsip --enable codec_gsm menuselect.makeopts )
 endef
 
 define Build/Compile
