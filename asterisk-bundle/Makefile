@@ -40,7 +40,7 @@ CONFIGURE_ARGS += \
 	--without-tonezone \
 	--without-dahdi \
 	--without-pri \
-	--without-gate
+	--without-res_srtp
 
 define Build/Configure
 	( cd $(PKG_BUILD_DIR); \
