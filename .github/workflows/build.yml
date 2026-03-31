@@ -20,7 +20,7 @@ jobs:
       - name: Download OpenWrt SDK (Filogic aarch64)
         run: |
           # Targeting OpenWrt 24.10 for MediaTek Filogic
-          wget https://downloads.openwrt.org/releases/24.10.0-rc1/targets/mediatek/filogic/openwrt-sdk-24.10.0-rc1-mediatek-filogic_gcc-13.3.0_musl.Linux-x86_64.tar.xz
+          wget https://downloads.openwrt.org/releases/24.10.6/targets/mediatek/filogic/openwrt-sdk-24.10.6-mediatek-filogic_gcc-13.3.0_musl.Linux-x86_64.tar.zst
           tar xf *.tar.xz --strip-components=1
 
       - name: Update and Install Feeds
