@@ -8,7 +8,6 @@ PKG_SOURCE:=asterisk-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://downloads.asterisk.org/pub/telephony/asterisk/releases/
 PKG_HASH:=skip
 
-# Source for the Quectel/SIMCom driver
 CHAN_QUECTEL_URL:=https://github.com/RoEdAl/asterisk-chan-quectel.git
 
 PKG_FIXUP:=autoreconf
@@ -19,10 +18,11 @@ include $(INCLUDE_DIR)/package.mk
 define Package/asterisk20-gateway-bundle
   SECTION:=net
   CATEGORY:=Network
-  TITLE:=Asterisk 20 GSM Gateway (Source Built)
+  TITLE:=Asterisk 20 GSM Gateway for OpenWrt 24.10
   DEPENDS:=+libedit +libopenssl +libncurses +libpthread +libuuid +libxml2 +sqlite3-cli +libsqlite3 +libtirpc +libcap +kmod-usb-serial-option +kmod-usb-serial-wwan +usbutils
 endef
 
+# Using bundled PJSIP and Jansson to avoid version conflicts in 24.10
 CONFIGURE_ARGS += \
 	--with-pjproject-bundled \
 	--with-jansson-bundled \
@@ -31,16 +31,15 @@ CONFIGURE_ARGS += \
 	--without-oss \
 	--disable-xmldoc \
 	--with-libedit \
-	--with-gsm
+	--with-gsm \
+	--with-iconv \
+	--with-srv \
 	--with-asound \
-    --with-iconv \
-    --with-srv \
-    --with-daudi \
-    --with-tonezone
+	--with-tonezone \
+	--without-dahdi
 
 define Build/Prepare
 	$(call Build/Prepare/Default)
-	# Clone the driver source into a subdirectory
 	git clone $(CHAN_QUECTEL_URL) $(PKG_BUILD_DIR)/chan-quectel-src
 endef
 
@@ -48,7 +47,7 @@ define Build/Compile
 	# 1. Compile Asterisk Core
 	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_FLAGS) ASTCFLAGS="-D_GNU_SOURCE"
 	
-	# 2. Compile chan-quectel against the freshly built Asterisk headers
+	# 2. Compile chan-quectel specifically for Asterisk 20
 	$(MAKE) -C $(PKG_BUILD_DIR)/chan-quectel-src \
 		$(MAKE_FLAGS) \
 		ASTERISK_INCLUDE_DIR=$(PKG_BUILD_DIR)/include \
@@ -58,18 +57,17 @@ endef
 define Package/asterisk20-gateway-bundle/install
 	$(INSTALL_DIR) $(1)/usr/sbin $(1)/usr/lib/asterisk/modules $(1)/etc/asterisk
 	
-	# Install Asterisk Binaries
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/main/asterisk $(1)/usr/sbin/
 	
-	# Install PJSIP Modules
+	# Install PJSIP and Core Modules
 	$(CP) $(PKG_BUILD_DIR)/channels/chan_pjsip.so $(1)/usr/lib/asterisk/modules/
 	$(CP) $(PKG_BUILD_DIR)/res/res_pjsip*.so $(1)/usr/lib/asterisk/modules/
 	$(CP) $(PKG_BUILD_DIR)/res/res_pjproject.so $(1)/usr/lib/asterisk/modules/
 	
-	# Install the Source-Compiled Quectel Module
+	# Install Source-Compiled Quectel Module
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/chan-quectel-src/chan_quectel.so $(1)/usr/lib/asterisk/modules/
 	
-	# Install Configs from your 'files' directory
+	# Copy local configs from /files folder
 	$(CP) ./files/* $(1)/etc/asterisk/ 2>/dev/null || true
 endef
 
