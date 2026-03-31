@@ -15,7 +15,7 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libncurses5-dev gawk git gettext libssl-dev xsltproc wget unzip python3 curl libedit-dev libsqlite3-dev uuid-dev libjansson-dev libxml2-dev
+          sudo apt-get install -y build-essential libncurses5-dev gawk git gettext libssl-dev xsltproc wget unzip python3 python3-dev pkg-config curl binutils libedit-dev libsqlite3-dev uuid-dev libjansson-dev libxml2-dev
 
       - name: Download SDK
         run: |
