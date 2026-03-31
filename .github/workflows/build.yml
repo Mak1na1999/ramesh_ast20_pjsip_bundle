@@ -1,0 +1,45 @@
+name: Build Asterisk 20 Gateway
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libncurses5-dev gawk git gettext libssl-dev xsltproc wget unzip python3 curl binutils
+
+      - name: Download SDK
+        run: |
+          wget https://downloads.openwrt.org/releases/24.10.6/targets/mediatek/filogic/openwrt-sdk-24.10.6-mediatek-filogic_gcc-13.3.0_musl.Linux-x86_64.tar.zst
+          tar xf *.tar.xz --strip-components=1
+
+      - name: Setup Feeds
+        run: |
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+
+      - name: Prepare Asterisk Package
+        run: |
+          mkdir -p package/asterisk-bundle
+          cp -r ${GITHUB_WORKSPACE}/asterisk-bundle/* package/asterisk-bundle/
+
+      - name: Compile
+        run: |
+          make defconfig
+          make package/asterisk-bundle/compile V=s -j$(nproc)
+
+      - name: Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Flint2-Asterisk20-SIM7600
+          path: bin/packages/aarch64_cortex-a53/base/asterisk20-gateway-bundle*.ipk
+          
