@@ -58,25 +58,29 @@ define Build/Compile
 endef
 
 define Package/asterisk20-gateway-bundle/install
-    $(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) ./files/asterisk.init $(1)/etc/init.d/asterisk
-	$(INSTALL_DIR) $(1)/usr/sbin $(1)/usr/lib/asterisk/modules $(1)/etc/asterisk
+	$(INSTALL_DIR) $(1)/usr/sbin $(1)/usr/lib/asterisk/modules $(1)/etc/asterisk $(1)/etc/init.d
 	
+	# Main Binary
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/main/asterisk $(1)/usr/sbin/
 	
-	# Install PJSIP and Core Modules
+	# Core PJSIP & Resource Modules (Crucial for Flint 2)
 	$(CP) $(PKG_BUILD_DIR)/channels/chan_pjsip.so $(1)/usr/lib/asterisk/modules/
 	$(CP) $(PKG_BUILD_DIR)/res/res_pjsip*.so $(1)/usr/lib/asterisk/modules/
 	$(CP) $(PKG_BUILD_DIR)/res/res_pjproject.so $(1)/usr/lib/asterisk/modules/
-    $(CP) $(PKG_BUILD_DIR)/codecs/codec_gsm.so $(1)/usr/lib/asterisk/modules/
+	$(CP) $(PKG_BUILD_DIR)/res/res_rtp_asterisk.so $(1)/usr/lib/asterisk/modules/
+	$(CP) $(PKG_BUILD_DIR)/res/res_sorcery*.so $(1)/usr/lib/asterisk/modules/
+	
+	# Codecs (Required for GSM to SIP translation)
+	$(CP) $(PKG_BUILD_DIR)/codecs/codec_gsm.so $(1)/usr/lib/asterisk/modules/
 	$(CP) $(PKG_BUILD_DIR)/codecs/codec_alaw.so $(1)/usr/lib/asterisk/modules/
 	$(CP) $(PKG_BUILD_DIR)/codecs/codec_ulaw.so $(1)/usr/lib/asterisk/modules/
 	
-	# Install Source-Compiled Quectel Module
+	# The SIM7600 Driver
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/chan-quectel-src/chan_quectel.so $(1)/usr/lib/asterisk/modules/
 	
-	# Copy local configs from /files folder
-	$(CP) ./files/* $(1)/etc/asterisk/ 2>/dev/null || true
+	# Configs & Init Script
+	$(CP) ./files/*.conf $(1)/etc/asterisk/ 2>/dev/null || true
+	$(INSTALL_BIN) ./files/asterisk.init $(1)/etc/init.d/asterisk 2>/dev/null || true
 endef
 
 $(eval $(call BuildPackage,asterisk20-gateway-bundle))
